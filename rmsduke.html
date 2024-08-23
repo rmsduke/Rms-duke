@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RMS Duke - Favorite Videos</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+      background-color: #ffeb3b;
+    }
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+    input[type="text"], button {
+      padding: 10px;
+      margin: 10px 0;
+      width: 100%;
+    }
+    .video-list {
+      margin-top: 20px;
+    }
+    .video-item {
+      display: flex;
+      justify-content: space-between;
+      background: #fff;
+      padding: 10px;
+      margin-bottom: 10px;
+      border: 1px solid #ddd;
+    }
+    .video-item a {
+      text-decoration: none;
+      color: #333;
+    }
+    .remove-btn {
+      color: red;
+      cursor: pointer;
+    }
+    #timeSpent {
+      text-align: center;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>RMS Duke - Favorite Videos</h1>
+  <button onclick="logout()">Logout</button>
+  <input type="text" id="videoLink" placeholder="Enter video link">
+  <button onclick="addVideo()">Upload Video</button>
+
+  <div class="video-list" id="videoList"></div>
+
+  <div id="timeSpent">Time spent on this website: <span id="timeCounter">0</span> seconds</div>
+
+  <script>
+    // Check if the user is logged in
+    if (!localStorage.getItem('loggedIn')) {
+      window.location.href = 'login.html'; // Redirect to login page if not logged in
+    }
+
+    // Logout function
+    function logout() {
+      localStorage.removeItem('loggedIn');
+      window.location.href = 'login.html'; // Redirect to login page
+    }
+
+    // Track time spent on the website
+    let timeSpent = 0;
+    setInterval(() => {
+      timeSpent++;
+      document.getElementById('timeCounter').textContent = timeSpent;
+    }, 1000); // Updates every second
+
+    // Function to load stored videos
+    function loadVideos() {
+      const videoList = JSON.parse(localStorage.getItem('videos')) || [];
+      const videoListDiv = document.getElementById('videoList');
+      videoListDiv.innerHTML = '';
+
+      videoList.forEach((video, index) => {
+        const videoItem = document.createElement('div');
+        videoItem.className = 'video-item';
+        
+        videoItem.innerHTML = `
+          <a href="${video}" target="_blank">${video}</a>
+          <span class="remove-btn" onclick="removeVideo(${index})">Remove</span>
+        `;
+        
+        videoListDiv.appendChild(videoItem);
+      });
+    }
+
+    // Function to add a video link
+    function addVideo() {
+      const videoLink = document.getElementById('videoLink').value;
+      if (videoLink.trim()) {
+        const videoList = JSON.parse(localStorage.getItem('videos')) || [];
+        videoList.push(videoLink.trim());
+        localStorage.setItem('videos', JSON.stringify(videoList));
+        document.getElementById('videoLink').value = '';
+        loadVideos();
+      } else {
+        alert('Please enter a valid video link.');
+      }
+    }
+
+    // Function to remove a video link
+    function removeVideo(index) {
+      const videoList = JSON.parse(localStorage.getItem('videos')) || [];
+      videoList.splice(index, 1);
+      localStorage.setItem('videos', JSON.stringify(videoList));
+      loadVideos();
+    }
+
+    // Initial loading of videos
+    loadVideos();
+  </script>
+
+</body>
+</html>
